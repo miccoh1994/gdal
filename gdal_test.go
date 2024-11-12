@@ -5,6 +5,7 @@
 package gdal
 
 import (
+	"fmt"
 	"image/png"
 	"os"
 	"testing"
@@ -90,4 +91,21 @@ func TestRegenerateOverviews(t *testing.T) {
 	if err := os.Remove("testdata/temp.png"); err != nil {
 		t.Errorf(err.Error())
 	}
+}
+
+func TestReadBlock(t *testing.T) {
+	ds, err := Open("testdata/smallgeo.tif", ReadOnly)
+	if err != nil {
+		t.Fatalf("failed to open test file: %v", err)
+	}
+	redband := ds.RasterBand(1)
+	x, y:= redband.BlockSize()
+	block := make([]byte, x*y)
+	err = redband.Read(0, 0, block)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	println(fmt.Sprintf("%v", block))
+	assert.Equal(t, len(block), 16)
+	assert.Equal(t, int(block[0]), 255)
 }

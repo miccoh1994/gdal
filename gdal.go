@@ -1361,7 +1361,11 @@ func (rasterBand RasterBand) IO(
 }
 
 // Read a block of image data efficiently
-func (rasterBand RasterBand) ReadBlock(xOff, yOff int, dataPtr unsafe.Pointer) error {
+func (rasterBand RasterBand) Read(xOff, yOff int, buffer interface{}) error {
+	_, dataPtr, err := determineBufferType(buffer)
+	if err != nil {
+		return err
+	}
 	cErr := C.GDALReadBlock(rasterBand.cval, C.int(xOff), C.int(yOff), dataPtr)
 	return CPLErrContainer{ErrVal: cErr}.Err()
 }
