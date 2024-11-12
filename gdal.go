@@ -1371,7 +1371,11 @@ func (rasterBand RasterBand) Read(xOff, yOff int, buffer interface{}) error {
 }
 
 // Write a block of image data efficiently
-func (rasterBand RasterBand) WriteBlock(xOff, yOff int, dataPtr unsafe.Pointer) error {
+func (rasterBand RasterBand) Write(xOff, yOff int, buffer interface{}) error {
+	_, dataPtr, err := determineBufferType(buffer)
+	if err != nil {
+		return err
+	}
 	cErr := C.GDALWriteBlock(rasterBand.cval, C.int(xOff), C.int(yOff), dataPtr)
 	return CPLErrContainer{ErrVal: cErr}.Err()
 }
