@@ -1021,6 +1021,10 @@ func (dataset Dataset) AddBand(dataType DataType, options []string) error {
 	return CPLErrContainer{ErrVal: cErr}.Err()
 }
 
+func (dataset Dataset) SpatialRef() SpatialReference {
+	return SpatialReference{C.GDALGetSpatialRef(dataset.cval)}
+}
+
 type ResampleAlg int
 
 const (

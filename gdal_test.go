@@ -109,3 +109,12 @@ func TestReadBlock(t *testing.T) {
 	assert.Equal(t, len(block), 16)
 	assert.Equal(t, int(block[0]), 255)
 }
+
+func TestGetSpatialRef(t *testing.T) {
+	ds, err := Open("testdata/smallgeo.tif", ReadOnly)
+	if err != nil {
+		t.Fatalf("failed to open test file: %v", err)
+	}
+	srs := ds.SpatialRef()
+	assert.Equal(t, srs.IsGeographic(), true)
+}
