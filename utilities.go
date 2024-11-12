@@ -269,13 +269,14 @@ func DEMProcessing(dstDS string, sourceDS Dataset, processing string, colorFileN
 
 	cprocessing := C.CString(processing)
 	defer C.free(unsafe.Pointer(cprocessing))
+
 	var ccolorFileName *C.char
-	if colorFileName == "" {
+	if colorFileName != "" {
 		ccolorFileName = C.CString(colorFileName)
 		defer C.free(unsafe.Pointer(ccolorFileName))
 	}
-
-	ds := C.GDALDEMProcessing(cdstDS,
+	ds := C.GDALDEMProcessing(
+		cdstDS,
 		sourceDS.cval,
 		cprocessing,
 		ccolorFileName,

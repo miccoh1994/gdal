@@ -84,7 +84,7 @@ func TestTranslate(t *testing.T) {
 	dstDS.Close()
 }
 
-func TestDEMProcessing(t *testing.T) {
+func TestDEMProcessingColorRelief(t *testing.T) {
 	srcDS, err := Open("testdata/demproc.tif", ReadOnly)
 	if err != nil {
 		t.Errorf("Open: %v", err)
@@ -99,6 +99,27 @@ func TestDEMProcessing(t *testing.T) {
 	dstDS.Close()
 
 	dstDS, err = Open("/tmp/demproc_output.tif", ReadOnly)
+	if err != nil {
+		t.Errorf("Open after raster DEM Processing: %v", err)
+	}
+	dstDS.Close()
+}
+
+func TestDEMProcessing(t *testing.T) {
+	srcDS, err := Open("testdata/demproc.tif", ReadOnly)
+	if err != nil {
+		t.Errorf("Open: %v", err)
+	}
+
+	opts := []string{"-of", "GTiff"}
+
+	dstDS, err := DEMProcessing("/tmp/demproc_output_hillshade.tif", srcDS, "hillshade", "", opts)
+	if err != nil {
+		t.Errorf("DEMProcessing: %v", err)
+	}
+	dstDS.Close()
+
+	dstDS, err = Open("/tmp/demproc_output_hillshade.tif", ReadOnly)
 	if err != nil {
 		t.Errorf("Open after raster DEM Processing: %v", err)
 	}
