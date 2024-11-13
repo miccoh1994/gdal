@@ -8,13 +8,19 @@ import "C"
 import (
 	"errors"
 	"fmt"
+	"os"
 	"reflect"
+	"runtime"
 	"unsafe"
 )
 
 var _ = fmt.Println
 
 func init() {
+	if os.Getenv("GDAL_DATA") == "" && runtime.GOOS == "windows" {
+		os.Setenv("GDAL_DATA", "/c/gdal/3.9.1/")
+	}
+
 	C.GDALAllRegister()
 }
 

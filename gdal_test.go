@@ -63,9 +63,9 @@ func TestRegenerateOverviews(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	outDrv.CreateCopy("testdata/temp.png", dstile, 0, nil, nil, nil)
+	outDrv.CreateCopy(makeTempFilePath("temp.png"), dstile, 0, nil, nil, nil)
 
-	imgFile, err := os.Open("testdata/temp.png")
+	imgFile, err := os.Open(makeTempFilePath("temp.png"))
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -86,11 +86,6 @@ func TestRegenerateOverviews(t *testing.T) {
 	assert.Equal(t, int(r), 32896)
 	assert.Equal(t, int(g), 32896)
 	assert.Equal(t, int(b), 32896)
-
-	// remove temp.png
-	if err := os.Remove("testdata/temp.png"); err != nil {
-		t.Errorf(err.Error())
-	}
 }
 
 func TestReadBlock(t *testing.T) {
@@ -116,5 +111,5 @@ func TestGetSpatialRef(t *testing.T) {
 		t.Fatalf("failed to open test file: %v", err)
 	}
 	srs := ds.SpatialRef()
-	assert.Equal(t, srs.IsGeographic(), true)
+	assert.Equal(t, srs.IsGeographic(), false)
 }

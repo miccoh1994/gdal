@@ -4,6 +4,8 @@ import (
 	"testing"
 )
 
+
+
 func TestVectorTranslate(t *testing.T) {
 	srcDS, err := OpenEx("testdata/test.shp", OFReadOnly, nil, nil, nil)
 	if err != nil {
@@ -12,12 +14,12 @@ func TestVectorTranslate(t *testing.T) {
 
 	opts := []string{"-t_srs", "epsg:4326", "-f", "GeoJSON"}
 
-	dstDS, err := VectorTranslate("/tmp/test4326.geojson", []Dataset{srcDS}, opts)
+	dstDS, err := VectorTranslate(makeTempFilePath("test4326.geojson"), []Dataset{srcDS}, opts)
 	if err != nil {
 		t.Errorf("Warp: %v", err)
 	}
 	dstDS.Close()
-	dstDS, err = OpenEx("/tmp/test4326.geojson", OFReadOnly|OFVector, []string{"geojson"}, nil, nil)
+	dstDS, err = OpenEx(makeTempFilePath("test4326.geojson"), OFReadOnly|OFVector, []string{"geojson"}, nil, nil)
 	if err != nil {
 		t.Errorf("Open after translate: %v", err)
 	}
@@ -32,12 +34,12 @@ func TestRasterize(t *testing.T) {
 
 	opts := []string{"-a", "code", "-tr", "10", "10"}
 
-	dstDS, err := Rasterize("/tmp/rasterized.tif", srcDS, opts)
+	dstDS, err := Rasterize(makeTempFilePath("rasterized.tif"), srcDS, opts)
 	if err != nil {
 		t.Errorf("Warp: %v", err)
 	}
 	dstDS.Close()
-	dstDS, err = Open("/tmp/rasterized.tif", ReadOnly)
+	dstDS, err = Open(makeTempFilePath("rasterized.tif"), ReadOnly)
 	if err != nil {
 		t.Errorf("Open after vector translate: %v", err)
 	}
@@ -53,13 +55,13 @@ func TestWarp(t *testing.T) {
 
 	opts := []string{"-t_srs", "epsg:3857", "-of", "GPKG"}
 
-	dstDS, err := Warp("/tmp/tiles-3857.gpkg", nil, []Dataset{srcDS}, opts)
+	dstDS, err := Warp(makeTempFilePath("tiles-3857.gpkg"), nil, []Dataset{srcDS}, opts)
 	if err != nil {
 		t.Errorf("Warp: %v", err)
 	}
 
 	pngdriver, err := GetDriverByName("PNG")
-	pngdriver.CreateCopy("/tmp/foo.png", dstDS, 0, nil, nil, nil)
+	pngdriver.CreateCopy(makeTempFilePath("foo.png"), dstDS, 0, nil, nil, nil)
 	dstDS.Close()
 }
 
@@ -71,13 +73,13 @@ func TestTranslate(t *testing.T) {
 
 	opts := []string{"-of", "GTiff"}
 
-	dstDS, err := Translate("/tmp/tiles.tif", srcDS, opts)
+	dstDS, err := Translate(makeTempFilePath("tiles.tif"), srcDS, opts)
 	if err != nil {
 		t.Errorf("Warp: %v", err)
 	}
 	dstDS.Close()
 
-	dstDS, err = Open("/tmp/tiles.tif", ReadOnly)
+	dstDS, err = Open(makeTempFilePath("tiles.tif"), ReadOnly)
 	if err != nil {
 		t.Errorf("Open after raster translate: %v", err)
 	}
@@ -92,13 +94,13 @@ func TestDEMProcessingColorRelief(t *testing.T) {
 
 	opts := []string{"-of", "GTiff"}
 
-	dstDS, err := DEMProcessing("/tmp/demproc_output.tif", srcDS, "color-relief", "testdata/demproc_colors.txt", opts)
+	dstDS, err := DEMProcessing(makeTempFilePath("demproc_output.tif"), srcDS, "color-relief", "testdata/demproc_colors.txt", opts)
 	if err != nil {
 		t.Errorf("DEMProcessing: %v", err)
 	}
 	dstDS.Close()
 
-	dstDS, err = Open("/tmp/demproc_output.tif", ReadOnly)
+	dstDS, err = Open(makeTempFilePath("demproc_output.tif"), ReadOnly)
 	if err != nil {
 		t.Errorf("Open after raster DEM Processing: %v", err)
 	}
@@ -113,13 +115,13 @@ func TestDEMProcessing(t *testing.T) {
 
 	opts := []string{"-of", "GTiff"}
 
-	dstDS, err := DEMProcessing("/tmp/demproc_output_hillshade.tif", srcDS, "hillshade", "", opts)
+	dstDS, err := DEMProcessing(makeTempFilePath("demproc_output_hillshade.tif"), srcDS, "hillshade", "", opts)
 	if err != nil {
 		t.Errorf("DEMProcessing: %v", err)
 	}
 	dstDS.Close()
 
-	dstDS, err = Open("/tmp/demproc_output_hillshade.tif", ReadOnly)
+	dstDS, err = Open(makeTempFilePath("demproc_output_hillshade.tif"), ReadOnly)
 	if err != nil {
 		t.Errorf("Open after raster DEM Processing: %v", err)
 	}
