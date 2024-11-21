@@ -1,6 +1,7 @@
 package gdal
 
 import (
+	"strings"
 	"testing"
 )
 
@@ -126,4 +127,27 @@ func TestDEMProcessing(t *testing.T) {
 		t.Errorf("Open after raster DEM Processing: %v", err)
 	}
 	dstDS.Close()
+}
+
+func TestVectorInfo(t *testing.T) {
+	ds, err := OpenEx("testdata/test.shp", OFReadOnly, nil, nil, nil)
+	if err != nil {
+		t.Errorf("Open: %v", err)
+	}
+
+	sql := "SELECT SUM(ST_Area(geometry)) AS TOTAL_AREA FROM test"
+	opts := []string{"-sql", sql, "-dialect", "SQLite"}
+	info := VectorInfo(ds, opts)
+	
+	expected := "INFO: Open of `testdata/test.shp' using driver `ESRI Shapefile' successful. Layer name: SELECT Geometry: None Feature Count: 1 Layer SRS WKT: (unknown) TOTAL_AREA: Real (0.0) OGRFeature(SELECT):0 TOTAL_AREA (Real) = 63754.5521128553"
+	expected = strings.ReplaceAll(expected, " ", "")
+	expected = strings.ReplaceAll(expected, "\n", "")
+	info = strings.ReplaceAll(info, " ", "")
+	info = strings.ReplaceAll(info, "\n", "")
+	if info != expected {
+		println("Expected: ", expected)
+		println("Got: ", info)
+		println("----")
+		t.Errorf("Expected %s, got %s", expected, info)
+	}
 }

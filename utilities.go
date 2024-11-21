@@ -50,6 +50,25 @@ func Info(sourceDS Dataset, options []string) string {
 
 }
 
+func VectorInfo(sourceDS Dataset, options []string) string {
+	length := len(options)
+	opts := make([]*C.char, length+1)
+	for i := 0; i < length; i++ {
+		opts[i] = C.CString(options[i])
+		defer C.free(unsafe.Pointer(opts[i]))
+	}
+	opts[length] = (*C.char)(unsafe.Pointer(nil))
+	infoOpts := C.GDALVectorInfoOptionsNew(
+		(**C.char)(unsafe.Pointer(&opts[0])),
+		(*C.GDALVectorInfoOptionsForBinary)(unsafe.Pointer(nil)))
+	defer C.GDALVectorInfoOptionsFree(infoOpts)
+	infoText := C.GDALVectorInfo(
+		sourceDS.cval,
+		infoOpts,
+	)
+	return C.GoString(infoText)
+}
+
 func BuildVRT(dstDS string, sourceDS []Dataset, srcDSFilePath, options []string) (Dataset, error) {
 	if dstDS == "" {
 		dstDS = "MEM:::"
